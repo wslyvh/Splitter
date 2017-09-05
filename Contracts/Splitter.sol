@@ -1,12 +1,21 @@
-pragma solidity ^0.4.4;
-import "mortal"
+pragma solidity ^0.4.16;
 
-contract Splitter is mortal {
-    
-    address public owner;
+contract Mortal {
+    address owner;
 
-    function Splitter(){
+    function mortal() { owner = msg.sender; }
+
+    function kill() { if (msg.sender == owner) suicide(owner); }
+}
+
+contract Owned {
+    address public owner; 
+
+    function Owned() {
         owner = msg.sender;
     }
+}
+
+contract Splitter is Mortal, Owned {
     
 }
