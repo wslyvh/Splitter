@@ -16,7 +16,6 @@ contract Mortal is Owned {
     }
 }
 
-
 contract Splitter is Mortal {
     address public recipientA; 
     address public recipientB; 
