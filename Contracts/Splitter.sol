@@ -39,7 +39,7 @@ contract Splitter is Mortal {
         recipientBalances[recipientB] += splitAmount;
         
         uint remainder = msg.value - splitAmount * 2;
-        owner.transfer(remainder);
+        msg.sender.transfer(remainder);
 
         return true;
     }
