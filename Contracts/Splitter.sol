@@ -1,5 +1,6 @@
 pragma solidity ^0.4.16;
 
+
 contract Owned {
     address public owner; 
 
@@ -17,8 +18,10 @@ contract Mortal is Owned {
 }
 
 contract Splitter is Mortal {
+
     address public recipientA; 
     address public recipientB; 
+    mapping(address => uint) public recipientBalances;
     
     function Splitter(address _recipientA, address _recipientB) {
         require(recipientA != 0x0);
@@ -32,13 +35,23 @@ contract Splitter is Mortal {
         require(msg.value != 0);
         
         uint splitAmount = msg.value / 2;
+        recipientBalances[recipientA] += splitAmount;
+        recipientBalances[recipientB] += splitAmount;
+        
         uint remainder = msg.value - splitAmount * 2;
-        
-        recipientA.transfer(splitAmount);
-        recipientB.transfer(splitAmount);
-        
         owner.transfer(remainder);
 
         return true;
-    }    
+    }
+    
+    function Withdraw() payable returns(bool success) {
+        require(msg.sender == recipientA || msg.sender == recipientB);
+        
+        uint amount = recipientBalances[msg.sender];
+        recipientBalances[msg.sender] -= amount;
+        
+        msg.sender.transfer(amount);
+
+        return true;
+    }
 }
