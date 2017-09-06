@@ -21,7 +21,7 @@ contract Remittance is Mortal {
     bytes32 hash;
     
     function Remittance(uint _deadline, bytes32 _hash) {
-        require(_deadline > 0);
+        require(_deadline > block.timestamp);
         require(_hash > 0);
         
         hash = _hash;
@@ -42,12 +42,6 @@ contract Remittance is Mortal {
         require(hash == keccak256(_passwordA, _passwordB));
         
         msg.sender.transfer(this.balance);
-        
-        return true;
-    }
-    
-    function TakeCut() payable returns (bool success) {
-        require(msg.sender == owner);
         
         return true;
     }
