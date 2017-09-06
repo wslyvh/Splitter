@@ -39,7 +39,7 @@ contract Remittance is Mortal {
         require(block.timestamp < deadline);
         require(_passwordA > 0);
         require(_passwordB > 0);
-        require(hash == keccak256(_passwordA == _passwordB));
+        require(hash == keccak256(_passwordA, _passwordB));
         
         msg.sender.transfer(this.balance);
         
