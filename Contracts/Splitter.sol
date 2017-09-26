@@ -28,6 +28,9 @@ contract Splitter is Terminable {
     mapping(address => uint) public recipientBalances;
     uint remaining;
     
+    event LogSplit(address indexed sender, uint amount);
+    event LogWithdrawal(address indexed sender, uint amount);
+
     function Splitter(address _recipientA, address _recipientB) public {
         require(recipientA != address(0));
         require(recipientB != address(0));
@@ -36,7 +39,7 @@ contract Splitter is Terminable {
         recipientB = _recipientB;
     }
     
-    function Split() payable public returns(bool success) {
+    function split() payable public returns(bool success) {
         require(msg.value != 0);
         
         uint splitAmount = (remaining + msg.value) / 2;
@@ -44,11 +47,12 @@ contract Splitter is Terminable {
         recipientBalances[recipientB] += splitAmount;
         
         remaining += msg.value - splitAmount * 2;
-
+        
+        LogSplit(msg.sender, msg.value);
         return true;
     }
     
-    function Withdraw() public returns(bool success) {
+    function withdraw() public returns(bool success) {
         require(msg.sender == recipientA || msg.sender == recipientB);
         
         uint amount = recipientBalances[msg.sender];
@@ -56,6 +60,7 @@ contract Splitter is Terminable {
         
         msg.sender.transfer(amount);
 
+        LogWithdrawal(msg.sender, amount);
         return true;
     }
 }
