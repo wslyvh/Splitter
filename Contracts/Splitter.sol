@@ -4,47 +4,51 @@ pragma solidity ^0.4.16;
 contract Owned {
     address public owner; 
 
-    function Owned() {
+    modifier fromOwner {
+        require(msg.sender == owner);
+        _;
+    }
+    
+    function Owned() public {
         owner = msg.sender;
     }
 }
 
-contract Mortal is Owned {
+contract Terminable is Owned {
     
-    function kill() { 
-        if (msg.sender == owner) 
-            suicide(owner); 
+    function terminate() fromOwner public { 
+        selfdestruct(owner); 
     }
 }
 
-contract Splitter is Mortal {
+contract Splitter is Terminable {
 
     address public recipientA; 
     address public recipientB; 
     mapping(address => uint) public recipientBalances;
+    uint remaining;
     
-    function Splitter(address _recipientA, address _recipientB) {
-        require(recipientA != 0x0);
-        require(recipientB != 0x0);
+    function Splitter(address _recipientA, address _recipientB) public {
+        require(recipientA != address(0));
+        require(recipientB != address(0));
         
         recipientA = _recipientA;
         recipientB = _recipientB;
     }
     
-    function Split() payable returns(bool success) {
+    function Split() payable public returns(bool success) {
         require(msg.value != 0);
         
-        uint splitAmount = msg.value / 2;
+        uint splitAmount = (remaining + msg.value) / 2;
         recipientBalances[recipientA] += splitAmount;
         recipientBalances[recipientB] += splitAmount;
         
-        uint remainder = msg.value - splitAmount * 2;
-        msg.sender.transfer(remainder);
+        remaining += msg.value - splitAmount * 2;
 
         return true;
     }
     
-    function Withdraw() payable returns(bool success) {
+    function Withdraw() public returns(bool success) {
         require(msg.sender == recipientA || msg.sender == recipientB);
         
         uint amount = recipientBalances[msg.sender];
