@@ -1,25 +1,6 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.15;
 
-
-contract Owned {
-    address public owner; 
-
-    modifier fromOwner {
-        require(msg.sender == owner);
-        _;
-    }
-    
-    function Owned() public {
-        owner = msg.sender;
-    }
-}
-
-contract Terminable is Owned {
-    
-    function terminate() fromOwner public { 
-        selfdestruct(owner); 
-    }
-}
+import "./Terminable.sol";
 
 contract Splitter is Terminable {
 
